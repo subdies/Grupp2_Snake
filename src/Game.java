@@ -77,8 +77,7 @@ public class Game extends JPanel {
 
 
         // DRAW funktion för ormens huvud.
-        g.setColor(Color.black);
-        g.fillRect(0, 0, boardWidth, boardHeight);
+
     }
 
 }
