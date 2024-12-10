@@ -10,6 +10,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     private final int boardHeight;
     private Timer timer;
 
+
     private int appleX, appleY;
     private boolean running = true;
     private boolean gameOverBool = false;
