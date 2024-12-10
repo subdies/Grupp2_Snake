@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Game extends JPanel {
@@ -9,10 +10,13 @@ public class Game extends JPanel {
     protected int boxSize = 30;
     protected boolean action;
 
+
+
     // Skapar tiles "rutor" som spelet kommer spela plats i.
     private class Tiles {
         int x;
         int y;
+
 
         Tiles(int x, int y) {
             this.x= x;
@@ -31,13 +35,15 @@ public class Game extends JPanel {
     Tiles snakeBody;
     Random random = new Random();
 
+
+
     Game(int boardWidth, int boardHeight) {
         this.boardWidth = boardWidth;
         setBackground(Color.black);
         this.boardHeight = boardHeight;
         setPreferredSize(new Dimension(boardWidth, boardHeight));
 
-
+newApple();
         snakeHead = new Tiles(20, 20);
     }
 
@@ -46,14 +52,18 @@ public class Game extends JPanel {
         draw(g);
     }
     public void draw(Graphics g) {
-
-// DRAW funktion för ormens kropp.
         for (int i = 0; i < bodySize; i++) {
             if (i == 0) {
-                g.setColor(Color.blue);
+                g.setColor(Color.green);
             } else {
-                g.setColor(Color.darkGray);
+                g.setColor(new Color(45, 180, 0));
             }
+            g.fillRect(x[i], y[i], boxSize, boxSize);
+
+
+
+
+
 // applens parameter
             g.setColor(Color.yellow);
             g.fillOval(appleX, appleY, boxSize, boxSize);
@@ -66,18 +76,19 @@ public class Game extends JPanel {
 
             }
         }
+
+    public void newApple() {
+        appleY = (int)(Math.random() * (boardWidth / boxSize)) * boxSize;
+        appleX = (int)(Math.random() * (boardHeight / boxSize)) * boxSize;
     }
-        public void newApple() {
-            appleY = (int)(Math.random() * (boardWidth / boxSize)) * boxSize;
-            appleX = (int)(Math.random() * (boardHeight / boxSize)) * boxSize;
-        }
 
 
 
 
 
-        // DRAW funktion för ormens huvud.
 
-    }
+    // DRAW funktion för ormens huvud.
+
+
 
 
