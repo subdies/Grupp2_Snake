@@ -158,16 +158,16 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         //System.out.println("key pressed" + key);
-        if (key == KeyEvent.VK_UP && dy == 0) {
+        if (key == KeyEvent.VK_UP || key ==KeyEvent.VK_W && dy == 0) {
             dx = 0;
             dy = -boxSize;
         } else if ((key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S) && dy == 0) {
             dx = 0;
             dy = boxSize;
-        } else if (key == KeyEvent.VK_LEFT && dx == 0) {
+        } else if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A && dx == 0) {
             dx = -boxSize;
             dy = 0;
-        } else if (key == KeyEvent.VK_RIGHT && dx == 0) {
+        } else if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D && dx == 0) {
             dx = boxSize;
             dy = 0;
         }
