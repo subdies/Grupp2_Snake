@@ -8,27 +8,42 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     private final int boxSize = 30;
     private final int boardWidth;
     private final int boardHeight;
-    private final Timer timer;
+    private Timer timer;
 
     private int appleX, appleY;
     private boolean running = true;
+    private boolean gameOverBool = false;
 
     private final ArrayList<Point> snake = new ArrayList<>();
     private int dx = boxSize, dy = 0; // Initial riktning (höger).
 
     Random random = new Random();
+    private final JFrame frame;
 
-    Game(int boardWidth, int boardHeight) {
+    public Game(int boardWidth, int boardHeight) {
+        this.frame = new JFrame("Snake");
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
+        GameStart();
+    }
+
+    private void GameStart() {
+
+
         setBackground(Color.black);
         setPreferredSize(new Dimension(boardWidth, boardHeight));
         setFocusable(true);
         addKeyListener(this);
 
         // Initiera orm och äpple
+        snake.clear();
         snake.add(new Point(boxSize * 3, boxSize * 3)); // Ormens huvud
         newApple();
+
+        running = true;
+        gameOverBool = false;
+        dx = boxSize;
+        dy = 0;
 
         // Timer för spelloopen
         timer = new Timer(150, this);
@@ -38,6 +53,15 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        //poäng
+        g.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        if (gameOverBool) {
+            g.setColor(Color.red);
+            g.drawString("Game Over: " + (snake.size() - 1), 100, 100);
+        } else {
+            g.setColor(Color.GREEN);
+            g.drawString("Score: " + (snake.size() - 1), 100, 100);
+        }
         if (running) {
             // Rita äpple
             g.setColor(Color.yellow);
@@ -54,6 +78,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                 g.fillRect(p.x, p.y, boxSize, boxSize);
             }
 
+
             // Rita grid (valfritt)
             g.setColor(Color.darkGray);
             for (int i = 0; i < boardWidth / boxSize; i++) {
@@ -61,16 +86,30 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                 g.drawLine(0, i * boxSize, boardWidth, i * boxSize);
             }
         } else {
-            showGameOver(g);
+
+            GameOver();
         }
     }
 
-    private void showGameOver(Graphics g) {
-        g.setColor(Color.red);
-        g.setFont(new Font("Arial", Font.BOLD, 30));
-        String message = "Game Over";
-        int textWidth = g.getFontMetrics().stringWidth(message);
-        g.drawString(message, (boardWidth - textWidth) / 2, boardHeight / 2);
+    private void GameOver() {
+        running = false;
+        gameOverBool = true;
+
+        int score = snake.size() - 1;
+        int response = JOptionPane.showConfirmDialog(
+                frame,
+                // Rutan är ful, den kommer behövas ändras
+                // Samma sak med score XD
+                "Game over. Your score was: " + score + "\n Do you want to play again?",
+                "Game over",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (response == JOptionPane.YES_OPTION) {
+            GameStart();
+        } else {
+            System.exit(0);
+        }
     }
 
     private void newApple() {
@@ -87,6 +126,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         // Kontrollera kollision med väggar eller sig själv
         if (newX < 0 || newY < 0 || newX >= boardWidth || newY >= boardHeight || snake.contains(new Point(newX, newY))) {
             running = false;
+            gameOverBool = true;
             timer.stop();
             return;
         }
@@ -101,6 +141,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
             snake.removeLast(); // Ta bort sista delen av kroppen
         }
     }
+
+
 
 
     @Override
