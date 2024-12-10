@@ -3,11 +3,11 @@ import java.awt.*;
 import java.util.Random;
 
 public class Game extends JPanel {
-    private int bodySize = 5;
-    private int appleX;
-    private int appleY;
-    private int boxSize = 30;
-    private boolean action;
+    protected int bodySize = 5;
+    protected int appleX;
+    protected int appleY;
+    protected int boxSize = 30;
+    protected boolean action;
 
     // Skapar tiles "rutor" som spelet kommer spela plats i.
     private class Tiles {
@@ -80,4 +80,4 @@ public class Game extends JPanel {
 
     }
 
-}
+
