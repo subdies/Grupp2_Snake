@@ -125,6 +125,20 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         } else if (key == KeyEvent.VK_RIGHT && dx == 0) {
             dx = boxSize;
             dy = 0;
+        } else if (key == KeyEvent.VK_W && dy == 0) {
+            dx = 0;
+            dy = -boxSize;
+        } else if (key == KeyEvent.VK_S && dy == 0) {
+            dx = 0;
+            dy = boxSize;
+        } else if (key == KeyEvent.VK_A && dx == 0) {
+            dx = -boxSize;
+            dy = 0;
+        } else if (key == KeyEvent.VK_D && dx == 0) {
+            dx = boxSize;
+            dy = 0;
+
+
         }
     }
 
