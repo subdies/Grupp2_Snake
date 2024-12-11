@@ -1,58 +1,179 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.Random;
 
-public class Game extends JPanel {
-    // Skapar tiles "rutor" som spelet kommer spela plats i.
-    private class Tiles {
-        int x;
-        int y;
+class Game extends JPanel implements ActionListener, KeyListener {
+    private final int boxSize = 30;
+    private final int boardWidth;
+    private final int boardHeight;
+    private Timer timer;
 
-        Tiles(int x, int y) {
-            this.x= x;
-            this.y= y;
+    private ArrayList<Point> snake = new ArrayList<>();
+    private boolean running = false;
+    private boolean gameOverBool = false;
+
+    private int appleX, appleY;
+
+    private int dx, dy;
+
+    private JFrame frame;
+
+    public Game(int boardWidth, int boardHeight) {
+        this.boardWidth = boardWidth;
+        this.boardHeight = boardHeight;
+        this.frame = new JFrame("Snake");
+
+        GameStart();
+    }
+
+    private void GameStart() {
+        setBackground(Color.black);
+        setPreferredSize(new Dimension(boardWidth, boardHeight));
+        setFocusable(true);
+        addKeyListener(this);
+
+        snake.clear();
+        snake.add(new Point(boxSize * 3, boxSize * 3)); // Ormens huvud
+        newApple();
+
+        running = true;
+        gameOverBool = false;
+
+        timer = new Timer(150, this);
+        timer.start();
+
+        dx = boxSize;
+        dy = 0;
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        g.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        if (gameOverBool) {
+            g.setColor(Color.red);
+            g.drawString("Game Over: " + (snake.size() - 1), 100, 100);
+        } else {
+            g.setColor(Color.GREEN);
+            g.drawString("Score: " + (snake.size() - 1), 100, 100);
+        }
+
+        if (running) {
+            g.setColor(Color.yellow);
+            g.fillOval(appleX, appleY, boxSize, boxSize);
+
+            for (int i = 0; i < snake.size(); i++) {
+                if (i == 0) {
+                    g.setColor(Color.green);
+                } else {
+                    g.setColor(new Color(45, 180, 0));
+                }
+                Point p = snake.get(i);
+                g.fillRect(p.getX(), p.getY(), boxSize, boxSize);
+            }
+
+            g.setColor(Color.darkGray);
+            for (int i = 0; i < boardWidth / boxSize; i++) {
+                g.drawLine(i * boxSize, 0, i * boxSize, boardHeight);
+                g.drawLine(0, i * boxSize, boardWidth, i * boxSize);
+            }
+        } else {
+            GameOver();
         }
     }
 
-    //Behöver lägga till funktion för rörelse, velocity?
+    private void GameOver() {
+        running = false;
+        gameOverBool = true;
 
+        int score = snake.size() - 1;
+        int response = JOptionPane.showConfirmDialog(
+                frame,
+                "Game over. Your score was: " + score + "\n Do you want to play again?",
+                "Game over",
+                JOptionPane.YES_NO_OPTION
+        );
 
-    int boardWidth, boardHeight;
-
-    // Lägger till huvudet på ormen som är en tile i början.
-    Tiles snakeHead, snakeTail;
-    Tiles food;
-    Tiles snakeBody;
-    Random random = new Random();
-
-    Game(int boardWidth, int boardHeight) {
-        this.boardWidth = boardWidth;
-        setBackground(Color.black);
-        this.boardHeight = boardHeight;
-        setPreferredSize(new Dimension(boardWidth, boardHeight));
-
-
-        snakeHead = new Tiles(20, 20);
+        if (response == JOptionPane.YES_OPTION) {
+            GameStart();
+        } else {
+            System.exit(0);
+        }
     }
 
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        draw(g);
-    }
-    public void draw(Graphics g) {
-        // DRAW funktion för ormens kropp.
-
-
-        //Draw funktion för äpplen.
-
-
-        //Draw funktion för linjerna emellan tiles.
-
-
-
-        // DRAW funktion för ormens huvud.
-        g.setColor(Color.black);
-        g.fillRect(0, 0, boardWidth, boardHeight);
+    private void newApple() {
+        Random random = new Random();
+        appleX = random.nextInt(boardWidth / boxSize) * boxSize;
+        appleY = random.nextInt(boardHeight / boxSize) * boxSize;
     }
 
+    private void moveSnake() {
+        Point head = snake.get(0);
+        int newX = head.getX() + dx;
+        int newY = head.getY() + dy;
+
+        // Kollision med gränser
+        if (newX < 0 || newY < 0 || newX >= boardWidth || newY >= boardHeight) {
+            running = false;
+            gameOverBool = true;
+            timer.stop();
+            return;
+        }
+
+        // Kollision med ormens kropp
+        for (int i = 1; i < snake.size(); i++) {
+            Point p = snake.get(i);
+            if (p.getX() == newX && p.getY() == newY) {
+                running = false;
+                gameOverBool = true;
+                timer.stop();
+                return;
+            }
+        }
+
+        snake.add(0, new Point(newX, newY));
+
+        if (newX == appleX && newY == appleY) {
+            newApple();
+        } else {
+            snake.remove(snake.size() - 1);
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (running) {
+            moveSnake();
+        }
+        repaint();
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        if ((key == KeyEvent.VK_UP || key == KeyEvent.VK_W) && dy == 0) {
+            dx = 0;
+            dy = -boxSize;
+        } else if ((key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S) && dy == 0) {
+            dx = 0;
+            dy = boxSize;
+        } else if ((key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) && dx == 0) {
+            dx = -boxSize;
+            dy = 0;
+        } else if ((key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D) && dx == 0) {
+            dx = boxSize;
+            dy = 0;
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
 }
