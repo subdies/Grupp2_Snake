@@ -1,21 +1,16 @@
 import javax.swing.*;
 
 public class App {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Snake");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+
         int boardWidth = 600;
         int boardHeight = 600;
-
-        JFrame frame = new JFrame("SnakeGame");
+        Game game = new Game(boardWidth, boardHeight);
+        frame.add(game);
         frame.pack();
-        frame.setSize(boardWidth, boardHeight);
         frame.setVisible(true);
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        Game snakeGame = new Game(boardWidth, boardHeight);
-        frame.add(snakeGame);
-
     }
 }
- 
