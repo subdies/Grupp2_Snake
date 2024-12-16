@@ -4,26 +4,26 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-class Game extends JPanel implements ActionListener, KeyListener {
+public class Game extends JPanel implements ActionListener, KeyListener, GameObserver {
     private final int boxSize = 30;
     private final int boardWidth;
     private final int boardHeight;
     private Timer timer;
+    private GameState gameState;
 
-    private ArrayList<Point> snake = new ArrayList<>();
-    private boolean running = false;
-    private boolean gameOverBool = false;
-
+    private ArrayList<GameObject> snake = new ArrayList<>();
     private int appleX, appleY;
-
     private int dx, dy;
-
     private JFrame frame;
 
     public Game(int boardWidth, int boardHeight) {
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
         this.frame = new JFrame("Snake");
+        this.gameState = new GameState();
+
+        // Lägger till observer
+        gameState.addObserver(this);
 
         GameStart();
     }
@@ -35,11 +35,11 @@ class Game extends JPanel implements ActionListener, KeyListener {
         addKeyListener(this);
 
         snake.clear();
-        snake.add(new Point(boxSize * 3, boxSize * 3)); // Ormens huvud
+        snake.add(GameObjectFactory.createObject("Point", boxSize * 3, boxSize * 3)); // Ormens huvud
         newApple();
 
-        running = true;
-        gameOverBool = false;
+        gameState.setRunning(true);
+        gameState.setGameOver(false);
 
         timer = new Timer(150, this);
         timer.start();
@@ -53,7 +53,7 @@ class Game extends JPanel implements ActionListener, KeyListener {
         super.paintComponent(g);
 
         g.setFont(new Font("Times New Roman", Font.BOLD, 20));
-        if (gameOverBool) {
+        if (gameState.isGameOver()) {
             g.setColor(Color.red);
             g.drawString("Game Over: " + (snake.size() - 1), 100, 100);
         } else {
@@ -61,7 +61,7 @@ class Game extends JPanel implements ActionListener, KeyListener {
             g.drawString("Score: " + (snake.size() - 1), 100, 100);
         }
 
-        if (running) {
+        if (gameState.isRunning()) {
             g.setColor(Color.yellow);
             g.fillOval(appleX, appleY, boxSize, boxSize);
 
@@ -71,8 +71,8 @@ class Game extends JPanel implements ActionListener, KeyListener {
                 } else {
                     g.setColor(new Color(45, 180, 0));
                 }
-                Point p = snake.get(i);
-                g.fillRect(p.getX(), p.getY(), boxSize, boxSize);
+                GameObject obj = snake.get(i);
+                g.fillRect(obj.getX(), obj.getY(), boxSize, boxSize);
             }
 
             g.setColor(Color.darkGray);
@@ -86,8 +86,8 @@ class Game extends JPanel implements ActionListener, KeyListener {
     }
 
     private void GameOver() {
-        running = false;
-        gameOverBool = true;
+        gameState.setRunning(false);
+        gameState.setGameOver(true);
 
         int score = snake.size() - 1;
         int response = JOptionPane.showConfirmDialog(
@@ -111,30 +111,30 @@ class Game extends JPanel implements ActionListener, KeyListener {
     }
 
     private void moveSnake() {
-        Point head = snake.get(0);
+        GameObject head = snake.get(0);
         int newX = head.getX() + dx;
         int newY = head.getY() + dy;
 
         // Kollision med gränser
         if (newX < 0 || newY < 0 || newX >= boardWidth || newY >= boardHeight) {
-            running = false;
-            gameOverBool = true;
+            gameState.setRunning(false);
+            gameState.setGameOver(true);
             timer.stop();
             return;
         }
 
         // Kollision med ormens kropp
         for (int i = 1; i < snake.size(); i++) {
-            Point p = snake.get(i);
+            GameObject p = snake.get(i);
             if (p.getX() == newX && p.getY() == newY) {
-                running = false;
-                gameOverBool = true;
+                gameState.setRunning(false);
+                gameState.setGameOver(true);
                 timer.stop();
                 return;
             }
         }
 
-        snake.add(0, new Point(newX, newY));
+        snake.add(0, GameObjectFactory.createObject("Point", newX, newY));
 
         if (newX == appleX && newY == appleY) {
             newApple();
@@ -145,7 +145,7 @@ class Game extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (running) {
+        if (gameState.isRunning()) {
             moveSnake();
         }
         repaint();
@@ -170,10 +170,13 @@ class Game extends JPanel implements ActionListener, KeyListener {
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-    }
+    public void keyReleased(KeyEvent e) {}
 
     @Override
-    public void keyTyped(KeyEvent e) {
+    public void keyTyped(KeyEvent e) {}
+
+    @Override
+    public void onGameOver(int score) {
+        System.out.println("Game Over! Score: " + score);
     }
 }
