@@ -77,7 +77,7 @@ public class Game extends JPanel implements ActionListener, KeyListener, GameObs
                 g.fillRect(obj.getX(), obj.getY(), boxSize, boxSize);
             }
 
-            g.setColor(Color.darkGray);
+            g.setColor( new Color(240,240,240,50));
             for (int i = 0; i < boardWidth / boxSize; i++) {
                 g.drawLine(i * boxSize, 0, i * boxSize, boardHeight);
                 g.drawLine(0, i * boxSize, boardWidth, i * boxSize);
