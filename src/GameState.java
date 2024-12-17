@@ -1,12 +1,20 @@
 import java.util.ArrayList;
 
+
+/**
+ * Observer design
+ * Gäller för denna klass samt GameObserver.
+ * Säger till objekten vilken state vi är i.
+ */
 public class GameState {
     private boolean running;
     private boolean gameOverBool;
+    private int score;
     private ArrayList<GameObserver> observers = new ArrayList<>();
 
     public GameState() {
         running = false;
+        score = 0;
         gameOverBool = false;
     }
 
@@ -19,6 +27,17 @@ public class GameState {
         if (!running) {
             notifyObservers();
         }
+    }
+
+    public void updateScore(int score){
+        this.score += score;
+    }
+
+    public void resetScore(){
+        this.score = 0;
+    }
+    public int getScore(){
+        return score;
     }
 
     public boolean isRunning() {
@@ -35,7 +54,7 @@ public class GameState {
 
     private void notifyObservers() {
         for (GameObserver observer : observers) {
-            observer.onGameOver(0); // Example score value, can be passed as an argument
+            observer.onGameOver(score);
         }
     }
 }

@@ -22,7 +22,6 @@ public class Game extends JPanel implements ActionListener, KeyListener, GameObs
         this.frame = new JFrame("Snake");
         this.gameState = new GameState();
 
-        // Lägger till observer
         gameState.addObserver(this);
 
         GameStart();
@@ -34,8 +33,11 @@ public class Game extends JPanel implements ActionListener, KeyListener, GameObs
         setFocusable(true);
         addKeyListener(this);
 
+        // Rensar ormen ifall man kör om spelet
+        gameState.resetScore();
         snake.clear();
         snake.add(GameObjectFactory.createObject("Point", boxSize * 3, boxSize * 3)); // Ormens huvud
+        // Placerar ut första äpplet.
         newApple();
 
         gameState.setRunning(true);
@@ -109,7 +111,7 @@ public class Game extends JPanel implements ActionListener, KeyListener, GameObs
         appleX = random.nextInt(boardWidth / boxSize) * boxSize;
         appleY = random.nextInt(boardHeight / boxSize) * boxSize;
     }
-
+    // Hantering av ormens rörelser, kollision med gränser, med sin kropp
     private void moveSnake() {
         GameObject head = snake.get(0);
         int newX = head.getX() + dx;
@@ -134,11 +136,15 @@ public class Game extends JPanel implements ActionListener, KeyListener, GameObs
             }
         }
 
+        //Skapar nytt huvud och kollar om det åt äpplet.
         snake.add(0, GameObjectFactory.createObject("Point", newX, newY));
 
+        //Om ormen åt äpplet, placerar ut eyy nytt
         if (newX == appleX && newY == appleY) {
+            gameState.updateScore(1);
             newApple();
         } else {
+            //Om ormen inte åt äpplet, ta bort en del av ormen.
             snake.remove(snake.size() - 1);
         }
     }
