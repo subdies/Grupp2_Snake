@@ -33,11 +33,8 @@ public class GameState {
         this.score += score;
     }
 
-    public void resetScore(){
+    public void resetScore() {
         this.score = 0;
-    }
-    public int getScore(){
-        return score;
     }
 
     public boolean isRunning() {

@@ -1,7 +1,7 @@
 public class GameObjectFactory {
     public static GameObject createObject(String type, int x, int y) {
 
-        /**
+        /*
          * Factory Design
          * Underlättar att skapade objekt.
          */
